@@ -1,0 +1,36 @@
+{
+  "name": "ractysh-group-platform",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "npm@11.13.0",
+  "workspaces": [
+    "apps/web",
+    "apps/api",
+    "apps/admin",
+    "packages/*"
+  ],
+  "scripts": {
+    "predev": "npm run prisma:generate --workspace apps/api",
+    "dev": "concurrently \"npm run dev --workspace apps/api\" \"npm run dev --workspace apps/web\"",
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev:api": "npm run dev --workspace apps/api",
+    "dev:admin": "npm run dev --workspace apps/admin",
+    "dev:turbo": "turbo dev",
+    "build:turbo": "turbo build",
+    "build": "npm run build --workspace apps/web && npm run build --workspace apps/api",
+    "build:admin": "npm run build --workspace apps/admin",
+    "lint": "npm run lint --workspace apps/web",
+    "typecheck": "npm run typecheck --workspace apps/web && npm run typecheck --workspace apps/api",
+    "typecheck:admin": "npm run typecheck --workspace apps/admin",
+    "seed:construction-works": "node scripts/seed-construction-works.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "concurrently": "^9.1.2",
+    "tsx": "^4.22.4",
+    "turbo": "^2.6.1"
+  },
+  "dependencies": {
+    "@react-map/india": "^1.0.21"
+  }
+}

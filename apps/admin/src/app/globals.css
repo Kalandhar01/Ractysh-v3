@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --background: #080808;
+  --surface: #111111;
+  --card: #151515;
+  --border: #232323;
+  --primary: #8f1118;
+  --accent: #b71c24;
+  --text: #f5f5f5;
+  --muted: #9b9b9b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: var(--background);
+  color: var(--text);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  font-family:
+    var(--font-manrope),
+    Manrope,
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  letter-spacing: 0;
+  text-rendering: geometricPrecision;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(183, 28, 36, 0.38);
+  color: #f5f5f5;
+}
+
+::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(143, 17, 24, 0.42);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(183, 28, 36, 0.54);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+@layer components {
+  .field {
+    @apply w-full rounded-md border border-[#232323] bg-[#080808] px-3 text-sm text-[#F5F5F5] outline-none transition placeholder:text-[#71717A] focus:border-[#8F1118]/70 focus:ring-2 focus:ring-[#8F1118]/10 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .textarea {
+    @apply w-full resize-y rounded-md border border-[#232323] bg-[#080808] px-3 py-2 text-sm leading-6 text-[#F5F5F5] outline-none transition placeholder:text-[#71717A] focus:border-[#8F1118]/70 focus:ring-2 focus:ring-[#8F1118]/10 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .label {
+    @apply block text-xs font-medium text-[#9B9B9B];
+  }
+}
+
+.animate-ai-pulse {
+  animation: ai-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes ai-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.62;
+  }
+
+  50% {
+    transform: scale(1.85);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
