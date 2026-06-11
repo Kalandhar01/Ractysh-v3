@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import type { NextRequest } from "next/server";
 import type { ArchitectureLeadStatus, ArchitectureMediaKind, ArchitectureProjectStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { projects as staticArchitectureProjects } from "./architectureContent";
 
 export type ArchitectureHeroView = {
   heading: string;
@@ -199,6 +200,33 @@ function toProjectView(project: {
   };
 }
 
+function fallbackProjectViews(): ArchitectureProjectView[] {
+  return staticArchitectureProjects.map((project, index) => {
+    const slug = slugify(project.title);
+
+    return {
+      id: `static-${slug}`,
+      slug,
+      number: project.number || projectNumber(index),
+      kicker: project.kicker,
+      title: project.title,
+      description: project.detail,
+      location: project.place,
+      projectType: project.kicker,
+      place: project.place,
+      image: project.image,
+      alt: project.alt,
+      scale: project.scale,
+      detail: project.detail,
+      year: "Concept",
+      area: null,
+      status: "concept" as ArchitectureProjectStatus,
+      galleryImages: [project.image],
+      featured: index < 3
+    };
+  });
+}
+
 function toHeroView(hero: {
   heading: string;
   description: string;
@@ -235,46 +263,62 @@ export async function ensureArchitectureDefaults() {
 }
 
 export async function getArchitecturePageData() {
-  const [hero, publishedProjects] = await Promise.all([
-    prisma.architectureHero.findUnique({
-      where: { key: "architecture-home" },
-      select: {
-        heading: true,
-        description: true,
-        videoUrl: true,
-        posterUrl: true,
-        primaryCtaText: true,
-        primaryCtaHref: true,
-        secondaryCtaText: true,
-        secondaryCtaHref: true
-      }
-    }),
-    prisma.architectureProject.findMany({
-      where: { published: true },
-      orderBy: [{ featured: "desc" }, { position: "asc" }, { createdAt: "asc" }],
-      take: 24,
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        description: true,
-        location: true,
-        projectType: true,
-        year: true,
-        area: true,
-        status: true,
-        coverImage: true,
-        coverImageAlt: true,
-        galleryImages: true,
-        featured: true
-      }
-    })
-  ]);
+  if (!process.env.DATABASE_URL?.trim()) {
+    return {
+      hero: defaultHero,
+      projects: fallbackProjectViews()
+    };
+  }
 
-  return {
-    hero: hero ? toHeroView(hero) : defaultHero,
-    projects: publishedProjects.map(toProjectView)
-  };
+  try {
+    const [hero, publishedProjects] = await Promise.all([
+      prisma.architectureHero.findUnique({
+        where: { key: "architecture-home" },
+        select: {
+          heading: true,
+          description: true,
+          videoUrl: true,
+          posterUrl: true,
+          primaryCtaText: true,
+          primaryCtaHref: true,
+          secondaryCtaText: true,
+          secondaryCtaHref: true
+        }
+      }),
+      prisma.architectureProject.findMany({
+        where: { published: true },
+        orderBy: [{ featured: "desc" }, { position: "asc" }, { createdAt: "asc" }],
+        take: 24,
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          description: true,
+          location: true,
+          projectType: true,
+          year: true,
+          area: true,
+          status: true,
+          coverImage: true,
+          coverImageAlt: true,
+          galleryImages: true,
+          featured: true
+        }
+      })
+    ]);
+
+    return {
+      hero: hero ? toHeroView(hero) : defaultHero,
+      projects: publishedProjects.length ? publishedProjects.map(toProjectView) : fallbackProjectViews()
+    };
+  } catch (error) {
+    console.warn("[architecture-cms] Falling back to static homepage content.", error);
+
+    return {
+      hero: defaultHero,
+      projects: fallbackProjectViews()
+    };
+  }
 }
 
 export async function getArchitectureAdminData(): Promise<ArchitectureAdminData> {

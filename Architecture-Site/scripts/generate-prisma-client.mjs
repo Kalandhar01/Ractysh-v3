@@ -4,8 +4,9 @@ import { execFileSync } from "node:child_process";
 
 const appRoot = process.cwd();
 const schemaPath = resolve(appRoot, "../packages/db/prisma/schema.prisma");
-const rootClientDir = resolve(appRoot, "../node_modules/.prisma/client");
 const localClientDir = resolve(appRoot, "node_modules/.prisma/client");
+
+rmSync(localClientDir, { recursive: true, force: true });
 
 execFileSync("prisma", ["generate", "--schema", schemaPath], {
   cwd: appRoot,
@@ -13,12 +14,23 @@ execFileSync("prisma", ["generate", "--schema", schemaPath], {
   shell: process.platform === "win32",
 });
 
-if (!existsSync(rootClientDir)) {
-  throw new Error(`Generated Prisma client not found at ${rootClientDir}`);
+const generatedClientCandidates = [
+  localClientDir,
+  resolve(appRoot, "../node_modules/.prisma/client"),
+  resolve(appRoot, "../packages/db/node_modules/.prisma/client"),
+];
+
+const generatedClientDir = generatedClientCandidates.find((candidate) => existsSync(candidate));
+
+if (!generatedClientDir) {
+  throw new Error(
+    `Generated Prisma client not found. Checked:\n${generatedClientCandidates.join("\n")}`
+  );
 }
 
-rmSync(localClientDir, { recursive: true, force: true });
-mkdirSync(dirname(localClientDir), { recursive: true });
-cpSync(rootClientDir, localClientDir, { recursive: true });
+if (generatedClientDir !== localClientDir) {
+  mkdirSync(dirname(localClientDir), { recursive: true });
+  cpSync(generatedClientDir, localClientDir, { recursive: true });
+}
 
 console.log(`Synced Prisma client to ${localClientDir}`);
