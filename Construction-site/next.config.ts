@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { resolve } from "node:path";
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: resolve(process.cwd(), "../"),
   allowedDevOrigins: [
     "10.185.136.238",
     "10.169.138.244",
@@ -11,7 +12,6 @@ const nextConfig: NextConfig = {
   images: {
     qualities: [48, 55, 75],
   },
-  transpilePackages: ["@ractysh/db"],
   turbopack: {
     root: resolve(process.cwd(), ".."),
   },

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "postinstall": "node scripts/patch-react-three-fiber-timer.mjs",
-    "prisma:generate": "prisma generate --schema ../packages/db/prisma/schema.prisma",
+    "prisma:generate": "node scripts/generate-prisma-client.mjs",
     "prebuild": "npm run prisma:generate",
     "dev": "next dev",
     "build": "next build",
@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
+    "@prisma/adapter-pg": "^6.19.3",
     "@prisma/client": "^6.19.3",
-    "@ractysh/db": "file:../packages/db",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@react-three/rapier": "^2.2.0",
@@ -31,6 +31,7 @@
     "motion": "^12.40.0",
     "next": "16.2.9",
     "ogl": "^1.0.11",
+    "pg": "^8.21.0",
     "postprocessing": "^6.39.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
